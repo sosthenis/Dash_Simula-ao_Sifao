@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Painel técnico para planejamento, simulação e comissionamento hidráulico dos sifões do Lote 4 do Eixão das Águas." />
+  <title>COGERH | Painel Técnico — Sifões Lote 4</title>
+<link rel="stylesheet" href="assets/app.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-block">
+      <div class="state-mark">CE</div>
+      <div>
+        <div class="eyebrow">GOVERNO DO ESTADO DO CEARÁ</div>
+        <div class="brand">COGERH <span>Companhia de Gestão dos Recursos Hídricos</span></div>
+      </div>
+    </div>
+    <div class="top-meta">
+      <span class="pill pill-blue">Painel técnico</span>
+      <span class="pill">Protótipo operacional</span>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div>
+      <div class="hero-kicker">Eixão das Águas · Lote 4 · Trechos II e III</div>
+      <h1>Dashboard de Comissionamento Hidráulico dos Sifões</h1>
+      <p>Planejamento, simulação de cenários, análise de transientes, acompanhamento da propagação da onda e apoio ao procedimento Go / No-Go do teste da 2ª linha.</p>
+    </div>
+    <div class="hero-status">
+      <div><span>Meta de aceite</span><strong>Q ≥ 9,5 m³/s</strong></div>
+      <div><span>Enchimento inicial</span><strong>≤ 0,475 m³/s</strong></div>
+      <div><span>Referência conservadora</span><strong>≥ 30 min</strong></div>
+    </div>
+  </section>
+
+  <div class="app-shell">
+    <aside class="sidebar">
+      <nav>
+        <a href="#overview">Visão geral</a>
+        <a href="#mapa">Mapa KMZ</a>
+        <a href="#simulador">Simulador</a>
+        <a href="#animacao">Animação hidráulica</a>
+        <a href="#matriz">Matriz de cenários</a>
+        <a href="#protocolo">Protocolo operacional</a>
+        <a href="#consorcio">Pacote ao Consórcio</a>
+        <a href="#fontes">Fontes técnicas</a>
+      </nav>
+      <div class="sidebar-note">
+        <strong>Uso do painel</strong>
+        <p>Ferramenta de screening e consolidação técnica. Não substitui o modelo HAMMER oficial nem a liberação formal da operação.</p>
+      </div>
+    </aside>
+
+    <main>
+      <section id="overview" class="panel">
+        <div class="section-head"><div><span class="section-kicker">1</span><h2>Visão geral da operação</h2></div></div>
+        <div class="kpi-grid">
+          <article class="kpi"><span>Primeiro sifão</span><strong>Boa Vista</strong><small>≈ 32,93 km desde Curral Velho</small></article>
+          <article class="kpi"><span>Último sifão</span><strong>Juazeirinho</strong><small>≈ 81,61 km acumulados</small></article>
+          <article class="kpi"><span>Capacidade do canal</span><strong>19,0 m³/s</strong><small>Seção de referência do Lote 4</small></article>
+          <article class="kpi"><span>Capacidade por linha</span><strong>9,5 m³/s</strong><small>DN 2.500 mm</small></article>
+        </div>
+        <div class="callout warning"><strong>Premissa operacional:</strong> a descarga liberada a montante não aparece instantaneamente no sifão. O sistema armazena água no canal, a perturbação hidráulica se propaga antes da massa d’água e a vazão de teste deve ser confirmada localmente antes do isolamento da linha antiga.</div>
+        <div class="two-col">
+          <div class="subpanel"><h3>Cadeia física do ensaio</h3><div id="distanceTable"></div></div>
+          <div class="subpanel"><h3>Criticidade de transientes</h3><div id="criticalTable"></div></div>
+        </div>
+      </section>
+
+      <section id="mapa" class="panel">
+        <div class="section-head"><div><span class="section-kicker">2</span><h2>Mapa geográfico detalhado do KMZ</h2></div><div class="hint">Mapa vetorial offline + geometrias extraídas do SISTEMA geral.kmz</div></div>
+        <div class="map-toolbar">
+          <button class="btn active" data-layer="all">Tudo</button>
+          <button class="btn" data-layer="canal">Canais</button>
+          <button class="btn" data-layer="tubular">Trechos tubulares</button>
+          <button class="btn" data-layer="sifao_alvo">6 sifões do ensaio</button>
+          <button class="btn" data-layer="ponto_protecao">Proteção catódica</button>
+          <button class="btn" id="zoomInMapBtn">＋ Zoom</button>
+          <button class="btn" id="zoomOutMapBtn">－ Zoom</button>
+          <button class="btn" id="fitMapBtn">Enquadrar sistema</button>
+        </div>
+        <div id="map" class="vector-map" aria-label="Mapa vetorial offline do Eixão das Águas"></div>
+        <div class="legend-box">
+          <span><i class="legend-line canal"></i> Canal</span>
+          <span><i class="legend-line tubular"></i> Trecho tubular</span>
+          <span><i class="legend-dot target"></i> Sifão do ensaio</span>
+          <span><i class="legend-dot origin"></i> Origem operacional</span>
+          <span><i class="legend-dot intermediate"></i> Palhano / estrutura intermediária</span>
+          <span class="offline-chip">✓ sem tiles externos / sem OpenStreetMap</span>
+        </div>
+      </section>
+
+      <section id="simulador" class="panel">
+        <div class="section-head"><div><span class="section-kicker">3</span><h2>Simulador operacional por sifão</h2></div><div id="modelBadge" class="pill pill-blue">HAMMER · screening</div></div>
+        <div class="scenario-presets">
+          <button class="preset" data-preset="standard">Teste padrão</button>
+          <button class="preset" data-preset="conservative">Fechamento 30 min</button>
+          <button class="preset" data-preset="veryconservative">Fechamento 90 min</button>
+          <button class="preset" data-preset="fast">Fechamento rápido 2 min</button>
+          <button class="preset" data-preset="withdrawal">Retirada 0,55 m³/s</button>
+          <button class="preset" data-preset="noComp">Retirada sem compensação</button>
+        </div>
+        <div class="control-grid">
+          <label class="control"><span>Sifão</span><select id="siphonSelect"></select></label>
+          <label class="control"><span>Vazão desejada no sifão <b id="targetQVal"></b></span><input id="targetQ" type="range" min="1" max="19" step="0.05" value="9.5"></label>
+          <label class="control"><span>Tempo de fechamento <b id="closureVal"></b></span><input id="closure" type="range" min="1" max="120" step="1" value="30"></label>
+          <label class="control"><span>Retiradas intermediárias <b id="withdrawVal"></b></span><input id="withdrawal" type="range" min="0" max="3" step="0.01" value="0"></label>
+          <label class="control"><span>Compensar retiradas?</span><select id="compensate"><option value="yes">Sim — elevar descarga a montante</option><option value="no">Não — manter descarga fixa</option></select></label>
+          <label class="control"><span>Vazão de enchimento <b id="fillVal"></b></span><input id="fillQ" type="range" min="0.1" max="2" step="0.005" value="0.475"></label>
+          <label class="control"><span>Método de transiente</span><select id="method"><option value="hammer">HAMMER</option><option value="allievi">Allievi modificada</option></select></label>
+          <label class="control"><span>Modo da animação</span><select id="animationMode"><option value="wave">Onda / sinal hidráulico</option><option value="mass">Massa d’água</option></select></label>
+        </div>
+        <div class="result-grid">
+          <article><span>Descarga requerida a montante</span><strong id="releaseQ"></strong><small id="releaseNote"></small></article>
+          <article><span>Vazão efetiva no sifão</span><strong id="effectiveQ"></strong><small>Regime estabilizado, desconsiderando armazenamento transitório.</small></article>
+          <article><span>Velocidade média no canal</span><strong id="channelV"></strong><small id="depthNote"></small></article>
+          <article><span>Chegada do sinal hidráulico</span><strong id="waveArrival"></strong><small>Estimativa V + c em canal livre.</small></article>
+          <article><span>Chegada da massa d’água</span><strong id="massArrival"></strong><small>Tempo advectivo aproximado.</small></article>
+          <article><span>ΔH transitório estimado</span><strong id="deltaH"></strong><small id="deltaHNote"></small></article>
+          <article><span>P mínima de screening</span><strong id="pmin"></strong><small id="pminNote"></small></article>
+          <article><span>Classificação</span><strong id="riskLabel"></strong><small id="riskNote"></small></article>
+        </div>
+        <div class="two-col charts-row">
+          <div class="subpanel"><h3>ΔH × tempo de fechamento</h3><svg id="transientChart" viewBox="0 0 760 360"></svg></div>
+          <div class="subpanel"><h3>Chegada da onda e da massa d’água</h3><svg id="arrivalChart" viewBox="0 0 760 360"></svg></div>
+        </div>
+      </section>
+
+      <section id="animacao" class="panel">
+        <div class="section-head"><div><span class="section-kicker">4</span><h2>Animação hidráulica — açude → canal → sifões</h2></div></div>
+        <div class="animation-stage">
+          <svg id="systemAnimation" viewBox="0 0 1320 390"></svg>
+          <div class="animation-controls">
+            <button class="btn" id="playAnim">▶ Reproduzir</button>
+            <button class="btn" id="pauseAnim">⏸ Pausar</button>
+            <button class="btn" id="resetAnim">↺ Reiniciar</button>
+            <span id="animationText"></span>
+          </div>
+        </div>
+      </section>
+
+      <section id="matriz" class="panel">
+        <div class="section-head"><div><span class="section-kicker">5</span><h2>Matriz dinâmica de cenários</h2></div><div class="hint">Comparação simultânea dos 6 sifões</div></div>
+        <div class="matrix-controls">
+          <label>Vazão <select id="matrixQ"><option>9.5</option><option>10</option><option>7.5</option><option>5</option></select> m³/s</label>
+          <label>Retirada intermediária <select id="matrixW"><option>0</option><option>0.55</option><option>1.0</option><option>1.5</option></select> m³/s</label>
+        </div>
+        <div class="table-wrap"><table class="scenario-table" id="scenarioMatrix"></table></div>
+        <div class="callout info">Cores da matriz: <strong>verde</strong> = condição favorável de screening; <strong>âmbar</strong> = atenção / margem limitada; <strong>vermelho</strong> = condição potencialmente crítica ou fechamento abaixo do limiar indicado na nota técnica.</div>
+      </section>
+
+      <section id="protocolo" class="panel">
+        <div class="section-head"><div><span class="section-kicker">6</span><h2>Protocolo operacional consolidado</h2></div></div>
+        <div class="protocol-grid">
+          <div class="step"><b>01</b><h3>Pré-teste</h3><p>Confirmar disponibilidade hídrica, janela operacional, tomadas intermediárias, integridade da linha nova, ventosas, comportas, comunicação e instrumentação.</p></div>
+          <div class="step"><b>02</b><h3>Enchimento</h3><p>Iniciar com vazão reduzida. A referência documental é 5% da vazão de projeto, cerca de 0,475 m³/s por linha.</p></div>
+          <div class="step"><b>03</b><h3>Estabilização</h3><p>Levar a entrada dos sifões a 9,5–10,0 m³/s e confirmar a condição real por medição. Não usar apenas tempo teórico.</p></div>
+          <div class="step"><b>04</b><h3>Transferência</h3><p>Fechar a linha antiga de forma lenta, monotônica, instrumentada e reversível, conforme lei de manobra aprovada.</p></div>
+          <div class="step"><b>05</b><h3>Período de observação</h3><p>Manter a linha antiga fechada por pelo menos 2 horas, acompanhando níveis, vazão e ocorrências.</p></div>
+          <div class="step"><b>06</b><h3>Aceite</h3><p>Priorizar medição a jusante. Aprovar a nova linha somente se Q ≥ 9,5 m³/s e não houver anomalias hidráulicas ou mecânicas.</p></div>
+        </div>
+      </section>
+
+      <section id="consorcio" class="panel">
+        <div class="section-head"><div><span class="section-kicker">7</span><h2>Pacote técnico a solicitar ao Consórcio CCEA</h2></div></div>
+        <div class="two-col">
+          <div class="check-card"><h3>Antes da liberação do teste</h3><ul><li>Arquivos nativos do HAMMER e memória de cálculo de cada sifão.</li><li>Perfis <em>as built</em>, cotas de entrada/saída, pontos altos/baixos e transições.</li><li>Curva de fechamento real das comportas/atuadores.</li><li>Limites de pressão positiva, vácuo e estabilidade estrutural das tubulações.</li><li>Projeto e comprovação funcional de ventosas, drenos e dispositivos de alívio.</li><li>Procedimento específico de enchimento e desaeração.</li></ul></div>
+          <div class="check-card"><h3>Simulações complementares recomendadas</h3><ul><li>Enchimento com bolsões de ar e ventosas em serviço.</li><li>Perda súbita de carga e interrupção de manobra.</li><li>Falha de ventosa e falha parcial de atuador.</li><li>Pressão mínima/máxima ao longo de toda a tubulação, não apenas junto à comporta.</li><li>Análise de sensibilidade para vazões distintas e tomadas intermediárias.</li><li>Lei de manobra mínima recomendada por sifão.</li></ul></div>
+        </div>
+      </section>
+
+      <section id="fontes" class="panel sources">
+        <div class="section-head"><div><span class="section-kicker">8</span><h2>Fontes e premissas do aplicativo</h2></div></div>
+        <p>O aplicativo reproduz os valores documentais do Lote 4 e utiliza aproximações apenas onde indicado como <strong>screening</strong>. Para tempos de fechamento superiores a 16 minutos, os valores do HAMMER são extrapolados aproximadamente por relação inversa com o tempo; para vazões diferentes de 9,5 m³/s, a componente transitória é escalada com a razão de velocidades. Essas extensões são exploratórias e não substituem nova rodada do modelo oficial.</p>
+        <div class="source-tags"><span>Nota Técnica — Transientes nas comportas</span><span>Metodologia de medição de vazão</span><span>KMZ SISTEMA geral</span><span>Dossiê técnico consolidado</span></div>
+      </section>
+    </main>
+  </div>
+
+  <footer><strong>COGERH · Painel técnico de apoio operacional</strong><span>Protótipo para análise, planejamento e discussão técnica.</span></footer>
+
+  <script src="data/eixao-data.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
